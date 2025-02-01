@@ -19,10 +19,11 @@ import ForgotPassword from '../../../components/ForgotPassword';
 import AppTheme from '../../../shared-theme/AppTheme';
 import ColorModeSelect from '../../../shared-theme/ColorModeSelect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon, EdifitechIcon } from '../../../components/CustomIcons';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn, getSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { CircularProgress } from '@mui/material';
-
+import { useRouter } from 'next/navigation'; // Agregar importación
+import { Sign } from 'crypto';
 
 
 
@@ -70,11 +71,15 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Login(props: { disableCustomTheme?: boolean }) {
+  const router = useRouter(); // Inicializar router
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
 
   const handleClickOpen = () => {
@@ -97,11 +102,13 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
       email: data.get('email'),
       password: data.get('password'),
     });
-    console.log( '🔥Result:',result);
     setLoading(false);
   
     if (result?.ok) {
+      console.log('🔥ok');
+      console.log(result);
       const session = await getSession();
+      console.log(session);
       const role = session?.user?.rol;
   
       if (role.name === 'admin') {
@@ -113,6 +120,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
       alert('Error al iniciar sesión');
     }
   };
+
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
@@ -222,6 +230,7 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
             >
               {loading ? <CircularProgress size={24} /> : 'Iniciar Sesión'}
             </Button>
+            
             <Link
               component="button"
               type="button"
@@ -241,6 +250,14 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
               startIcon={<GoogleIcon />}
             >
               Inicia sesión con Google
+            </Button>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              onClick={() => signOut()}
+            >
+              Cerrar Sesión
             </Button>
 
             <Typography sx={{ textAlign: 'center' }}>

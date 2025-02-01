@@ -11,6 +11,3 @@ export const keystoneContext: Context = (globalThis as any).keystoneContext ?? g
 if (process.env.NODE_ENV !== 'production') {
   (globalThis as any).keystoneContext = keystoneContext
 }
-
-
-
